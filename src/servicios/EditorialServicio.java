@@ -1,33 +1,33 @@
 package servicios;
 
-import entidades.Autor;
+import entidades.Editorial;
 import java.util.List;
 import java.util.Scanner;
 import javax.persistence.EntityManager;
 
-public class AutorServicio {
+public class EditorialServicio {
     Scanner scan = new Scanner(System.in).useDelimiter("\n");
     LibreriaServicio p = new LibreriaServicio();
     
-    public void darAltaAutor() throws Exception {
+    public void darAltaEditorial() throws Exception {
         try {
             
             EntityManager em = p.crearEntityManager();
             
             try {
-                // Crear autor
-                Autor autor = ingresarDatosAutor(new Autor());
+                // Crear Editorial
+                Editorial editorial = ingresarDatosEditorial(new Editorial());
                 
                 // Validaciones
-                if (autor.getNombre().isEmpty()) {
+                if (editorial.getNombre().isEmpty()) {
                     throw new Exception("El campo Nombre es obligatorio");
                 }
-                if (existeAutor(autor.getNombre())) {
-                    throw new Exception("Ya existe el autor: " + autor.getNombre());
+                if (existeEditorial(editorial.getNombre())) {
+                    throw new Exception("Ya existe la editorial: " + editorial.getNombre());
                 }
 
                 em.getTransaction().begin();
-                em.persist(autor);
+                em.persist(editorial);
                 em.getTransaction().commit();
                 
             } catch (Exception e) {
@@ -39,7 +39,7 @@ public class AutorServicio {
         }
     }
     
-    public void modificarAutor(int id) throws Exception {
+    public void modificarEditorial(int id) throws Exception {
         EntityManager em = p.crearEntityManager();
         
         // Validaciones
@@ -48,17 +48,17 @@ public class AutorServicio {
         }
         
         try {
-            Autor autor = (Autor) em
-                    .createQuery("SELECT a FROM Autor a WHERE a.id = :id")
+            Editorial editorial = (Editorial) em
+                    .createQuery("SELECT e FROM Editorial e WHERE e.id = :id")
                     .setParameter("id", id)
                     .getSingleResult();
 
-            // Pasar los nuevos datos a autor
-            Autor nuevoAutor = ingresarDatosAutor(autor);
-            autor.setNombre(nuevoAutor.getNombre());
+            // Pasar los nuevos datos a Editorial
+            Editorial nuevaEditorial = ingresarDatosEditorial(editorial);
+            editorial.setNombre(nuevaEditorial.getNombre());
 
             em.getTransaction().begin();
-            em.merge(autor);
+            em.merge(editorial);
             em.getTransaction().commit();
         } catch (Exception e) {
             throw new Exception("No se encontraron registros con el id: " + id);
@@ -66,7 +66,7 @@ public class AutorServicio {
             
     }
     
-    public void darBajaAutor(int id) throws Exception {
+    public void darBajaEditorial(int id) throws Exception {
         EntityManager em = p.crearEntityManager();
         
         // Validaciones
@@ -75,23 +75,23 @@ public class AutorServicio {
         }
         
         try {
-            Autor autor = (Autor) em
-                    .createQuery("SELECT a FROM Autor a WHERE a.id = :id")
+            Editorial editorial = (Editorial) em
+                    .createQuery("SELECT e FROM Editorial e WHERE e.id = :id")
                     .setParameter("id", id)
                     .getSingleResult();
 
-            autor.setAlta(false);
+            editorial.setAlta(false);
 
             em.getTransaction().begin();
-            em.merge(autor);
+            em.merge(editorial);
             em.getTransaction().commit();
+            
         } catch (Exception e) {
             throw new Exception("No se encontraron registros con el id: " + id);
         }
-        
     }
     
-    public Autor buscarAutorPorId(int id) throws Exception {
+    public Editorial buscarEditorialPorId(int id) throws Exception {
         EntityManager em = p.crearEntityManager();
 
         // Validaciones
@@ -100,12 +100,12 @@ public class AutorServicio {
         }
         
         try {
-            Autor autor = (Autor) em
-                    .createQuery("SELECT a FROM Autor a WHERE a.nombre = :id")
+            Editorial editorial = (Editorial) em
+                    .createQuery("SELECT e FROM Editorial e WHERE e.id = :id")
                     .setParameter("id", id)
                     .getSingleResult();
 
-            return autor;
+            return editorial;
             
         } catch (Exception e) {
             throw new Exception("No se encontraron registros con el id: " + id);
@@ -113,7 +113,7 @@ public class AutorServicio {
         
     }
     
-    public boolean existeAutor(String nombre) throws Exception {
+    public boolean existeEditorial(String nombre) throws Exception {
         EntityManager em = p.crearEntityManager();
 
         // Validaciones
@@ -122,8 +122,8 @@ public class AutorServicio {
         }
         
         try {
-            Autor autor = (Autor) em
-                    .createQuery("SELECT a FROM Autor a WHERE a.nombre = :nombre")
+            Editorial editorial = (Editorial) em
+                    .createQuery("SELECT e FROM Editorial e WHERE e.nombre = :nombre")
                     .setParameter("nombre", nombre)
                     .getSingleResult();
             
@@ -135,28 +135,27 @@ public class AutorServicio {
         
     }
     
-    public List<Autor> obtenerAutores() throws Exception {
+    public List<Editorial> obtenerEditoriales() throws Exception {
         EntityManager em = p.crearEntityManager();
 
-        List<Autor> autores = em
-                .createQuery("SELECT a FROM Autor a WHERE a.alta <> false")
+        List<Editorial> editoriales = em
+                .createQuery("SELECT e FROM Editorial e WHERE e.alta <> false")
                 .getResultList();
 
-        if (autores.isEmpty()) 
-            System.out.println("Aun no hay autores");
+        if (editoriales.isEmpty()) 
+            System.out.println("Aun no hay editoriales");
         
-        return autores;
+        return editoriales;
     }
     
-    private Autor ingresarDatosAutor(Autor autor) {
-        System.out.println("Ingresa el nombre del autor");
-        autor.setNombre(scan.nextLine());
+    private Editorial ingresarDatosEditorial(Editorial editorial) {
+        System.out.println("Ingresa el nombre de la Editorial");
+        editorial.setNombre(scan.nextLine());
         
-        if (!autor.isAlta()) {
-            autor.setAlta(true);
+        if (!editorial.isAlta()) {
+            editorial.setAlta(true);
         }
         
-        return autor;
+        return editorial;
     }
-    
 }
