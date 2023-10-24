@@ -92,7 +92,7 @@ public class AutorServicio {
         
         try {
             Autor autor = (Autor) em
-                    .createQuery("SELECT a FROM Autor a WHERE a.nombre = :id")
+                    .createQuery("SELECT a FROM Autor a WHERE a.id = :id")
                     .setParameter("id", id)
                     .getSingleResult();
 
@@ -114,6 +114,26 @@ public class AutorServicio {
             System.out.println("Aun no hay autores");
         
         return autores;
+    }
+    
+    public Autor buscarAutorPorNombre(String nombre) throws Exception {
+        EntityManager em = p.crearEntityManager();
+
+        // Validaciones
+        // Validar que la string no esté vacía
+        if (nombre.isEmpty()) throw new Exception("No se ingresó un nombre");
+        
+        try {
+            Autor autor = (Autor) em
+                    .createQuery("SELECT a FROM Autor a WHERE a.nombre = :nombre")
+                    .setParameter("nombre", nombre)
+                    .getSingleResult();
+
+            return autor;
+            
+        } catch (Exception e) {
+            throw e;
+        }
     }
     
     public boolean existeAutor(String nombre) throws Exception {

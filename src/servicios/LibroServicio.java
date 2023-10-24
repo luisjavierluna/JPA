@@ -118,8 +118,7 @@ public class LibroServicio {
             
         } catch (Exception e) {
             throw e;
-        }
-        
+        }   
     }
     
     public List<Libro> obtenerLibros() throws Exception {
@@ -133,6 +132,66 @@ public class LibroServicio {
             System.out.println("Aun no hay Libros");
         
         return libros;
+    }
+    
+    public Libro buscarLibroPorTitulo(String titulo) throws Exception {
+        EntityManager em = p.crearEntityManager();
+
+        // Validaciones
+        // Validar que la string no esté vacía
+        if (titulo.isEmpty()) throw new Exception("No se ingresó un Titulo");
+        
+        try {
+            Libro libro = (Libro) em
+                    .createQuery("SELECT l FROM Libro l WHERE l.titulo = :titulo")
+                    .setParameter("titulo", titulo)
+                    .getSingleResult();
+
+            return libro;
+            
+        } catch (Exception e) {
+            throw e;
+        }   
+    }
+    
+    public Libro buscarLibroPorNombreAutor(String nombreAutor) throws Exception {
+        EntityManager em = p.crearEntityManager();
+
+        // Validaciones
+        // Validar que la string no esté vacía
+        if (nombreAutor.isEmpty()) throw new Exception("No se ingresó un nombre");
+        
+        try {
+            Libro libro = (Libro) em
+                    .createQuery("SELECT l FROM Libro l JOIN l.autor a WHERE a.nombre = :nombreAutor")
+                    .setParameter("nombreAutor", nombreAutor)
+                    .getSingleResult();
+
+            return libro;
+            
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+    
+    public Libro buscarLibroPorNombreEditorial(String nombreEditorial) throws Exception {
+        EntityManager em = p.crearEntityManager();
+
+        // Validaciones
+        // Validar que la string no esté vacía
+        if (nombreEditorial.isEmpty()) throw new Exception("No se ingresó un nombre");
+        
+        try {
+            Libro libro = (Libro) em
+                    .createQuery("SELECT l FROM Libro l JOIN l.editorial e WHERE e.nombre = :nombreEditorial")
+                    .setParameter("nombreEditorial", nombreEditorial)
+                    .getSingleResult();
+
+            return libro;
+            
+        } catch (Exception e) {
+            throw e;
+        }
     }
     
     public boolean existeLibro(String titulo) throws Exception {

@@ -17,6 +17,7 @@ public class main {
             // System.out.println(as.obtenerAutores());
             // as.modificarAutor(12);
             // as.darBajaAutor(4);
+            // System.out.println(as.buscarAutorPorNombre("Autor 300")); 
         
         // EDITORIAL
             // es.darAltaEditorial();
@@ -27,10 +28,13 @@ public class main {
             
         // LIBRO
             // ls.darAltaLibro();
-            // System.out.println(ls.buscarLibroPorId(4));
+            // System.out.println(ls.buscarLibroPorISBN(4));
             // System.out.println(ls.obtenerLibros());
             // ls.modificarLibro(3);
             // ls.darBajaLibro(2);
+            // System.out.println(ls.buscarLibroPorTitulo("Titulo 4"));
+            // System.out.println(ls.buscarLibroPorNombreAutor("Autor 300"));
+            // System.out.println(ls.buscarLibroPorNombreEditorial("Editorial 4"));
             
     }
     
