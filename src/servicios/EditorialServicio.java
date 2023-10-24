@@ -9,43 +9,32 @@ public class EditorialServicio {
     Scanner scan = new Scanner(System.in).useDelimiter("\n");
     LibreriaServicio p = new LibreriaServicio();
     
-    public void darAltaEditorial() throws Exception {
-        try {
-            
-            EntityManager em = p.crearEntityManager();
-            
-            try {
-                // Crear Editorial
-                Editorial editorial = ingresarDatosEditorial(new Editorial());
-                
-                // Validaciones
-                if (editorial.getNombre().isEmpty()) {
-                    throw new Exception("El campo Nombre es obligatorio");
-                }
-                if (existeEditorial(editorial.getNombre())) {
-                    throw new Exception("Ya existe la editorial: " + editorial.getNombre());
-                }
+    public Editorial darAltaEditorial() throws Exception {
+        EntityManager em = p.crearEntityManager();
 
-                em.getTransaction().begin();
-                em.persist(editorial);
-                em.getTransaction().commit();
-                
-            } catch (Exception e) {
-                throw e;
-            }
-            
+        try {
+            // Crear Editorial
+            Editorial editorial = ingresarDatosEditorial(new Editorial());
+
+            em.getTransaction().begin();
+            em.persist(editorial);
+            em.getTransaction().commit();
+
+            return editorial;
+
         } catch (Exception e) {
             throw e;
         }
     }
     
-    public void modificarEditorial(int id) throws Exception {
+    public Editorial modificarEditorial(int id) throws Exception {
         EntityManager em = p.crearEntityManager();
         
         // Validaciones
-        if (Integer.toString(id).isEmpty()) {
+        if (Integer.toString(id).isEmpty())
             throw new Exception("El campo Id es obligatorio");
-        }
+        if (buscarEditorialPorId(id).getId()!= id) 
+            throw new Exception("No se encontraron editoriales con el Id: " + id);
         
         try {
             Editorial editorial = (Editorial) em
@@ -60,19 +49,20 @@ public class EditorialServicio {
             em.getTransaction().begin();
             em.merge(editorial);
             em.getTransaction().commit();
-        } catch (Exception e) {
-            throw new Exception("No se encontraron registros con el id: " + id);
-        }
             
+            return editorial;
+            
+        } catch (Exception e) {
+            throw e;
+        }       
     }
     
     public void darBajaEditorial(int id) throws Exception {
         EntityManager em = p.crearEntityManager();
         
         // Validaciones
-        if (Integer.toString(id).isEmpty()) {
-            throw new Exception("El campo Id es obligatorio");
-        }
+        // Validar que el Id pueda existir en la base de datos
+        if (id < 1) throw new Exception("No se ingresó un Id correcto");
         
         try {
             Editorial editorial = (Editorial) em
@@ -87,7 +77,7 @@ public class EditorialServicio {
             em.getTransaction().commit();
             
         } catch (Exception e) {
-            throw new Exception("No se encontraron registros con el id: " + id);
+            throw e;
         }
     }
     
@@ -95,9 +85,8 @@ public class EditorialServicio {
         EntityManager em = p.crearEntityManager();
 
         // Validaciones
-        if (Integer.toString(id).isEmpty()) {
-            throw new Exception("El campo Id es obligatorio");
-        }
+        // Validar que el Id pueda existir en la base de datos
+        if (id < 1) throw new Exception("No se ingresó un Id correcto");
         
         try {
             Editorial editorial = (Editorial) em
@@ -108,31 +97,8 @@ public class EditorialServicio {
             return editorial;
             
         } catch (Exception e) {
-            throw new Exception("No se encontraron registros con el id: " + id);
+            throw e;
         }
-        
-    }
-    
-    public boolean existeEditorial(String nombre) throws Exception {
-        EntityManager em = p.crearEntityManager();
-
-        // Validaciones
-        if (nombre.isEmpty()) {
-            throw new Exception("El campo nombre es obligatorio");
-        }
-        
-        try {
-            Editorial editorial = (Editorial) em
-                    .createQuery("SELECT e FROM Editorial e WHERE e.nombre = :nombre")
-                    .setParameter("nombre", nombre)
-                    .getSingleResult();
-            
-            return true;
-            
-        } catch (Exception e) {
-            return false;
-        }
-        
     }
     
     public List<Editorial> obtenerEditoriales() throws Exception {
@@ -148,11 +114,37 @@ public class EditorialServicio {
         return editoriales;
     }
     
-    private Editorial ingresarDatosEditorial(Editorial editorial) {
+    public boolean existeEditorial(String nombre) throws Exception {
+        EntityManager em = p.crearEntityManager();
+
+        // Validaciones
+        // Validar si se ingresó una string
+        if (nombre.isEmpty()) throw new Exception("El campo nombre es obligatorio");
+        
+        try {
+            Editorial editorial = (Editorial) em
+                    .createQuery("SELECT e FROM Editorial e WHERE e.nombre = :nombre")
+                    .setParameter("nombre", nombre)
+                    .getSingleResult();
+            
+            return true;
+            
+        } catch (Exception e) {
+            return false;
+        }   
+    }
+    
+    private Editorial ingresarDatosEditorial(Editorial editorial) throws Exception {
         System.out.println("Ingresa el nombre de la Editorial");
         editorial.setNombre(scan.nextLine());
         
-        if (!editorial.isAlta()) {
+        // Validaciones
+        if (editorial.getNombre().isEmpty()) 
+            throw new Exception("El campo Nombre es obligatorio");
+        if (existeEditorial(editorial.getNombre())) 
+            throw new Exception("Ya existe la editorial: " + editorial.getNombre());
+        
+        if (editorial.getId() == 0) {
             editorial.setAlta(true);
         }
         

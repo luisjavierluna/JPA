@@ -9,43 +9,32 @@ public class AutorServicio {
     Scanner scan = new Scanner(System.in).useDelimiter("\n");
     LibreriaServicio p = new LibreriaServicio();
     
-    public void darAltaAutor() throws Exception {
-        try {
-            
-            EntityManager em = p.crearEntityManager();
-            
-            try {
-                // Crear autor
-                Autor autor = ingresarDatosAutor(new Autor());
-                
-                // Validaciones
-                if (autor.getNombre().isEmpty()) {
-                    throw new Exception("El campo Nombre es obligatorio");
-                }
-                if (existeAutor(autor.getNombre())) {
-                    throw new Exception("Ya existe el autor: " + autor.getNombre());
-                }
+    public Autor darAltaAutor() throws Exception {
+        EntityManager em = p.crearEntityManager();
 
-                em.getTransaction().begin();
-                em.persist(autor);
-                em.getTransaction().commit();
-                
-            } catch (Exception e) {
-                throw e;
-            }
-            
+        try {
+            // Crear autor
+            Autor autor = ingresarDatosAutor(new Autor());
+
+            em.getTransaction().begin();
+            em.persist(autor);
+            em.getTransaction().commit();
+
+            return autor;
+
         } catch (Exception e) {
             throw e;
         }
     }
     
-    public void modificarAutor(int id) throws Exception {
+    public Autor modificarAutor(int id) throws Exception {
         EntityManager em = p.crearEntityManager();
         
         // Validaciones
-        if (Integer.toString(id).isEmpty()) {
+        if (Integer.toString(id).isEmpty()) 
             throw new Exception("El campo Id es obligatorio");
-        }
+        if (buscarAutorPorId(id).getId()!= id) 
+            throw new Exception("No se encontraron autores con el Id: " + id);
         
         try {
             Autor autor = (Autor) em
@@ -60,8 +49,11 @@ public class AutorServicio {
             em.getTransaction().begin();
             em.merge(autor);
             em.getTransaction().commit();
+            
+            return autor;
+            
         } catch (Exception e) {
-            throw new Exception("No se encontraron registros con el id: " + id);
+            throw e;
         }
             
     }
@@ -70,9 +62,8 @@ public class AutorServicio {
         EntityManager em = p.crearEntityManager();
         
         // Validaciones
-        if (Integer.toString(id).isEmpty()) {
-            throw new Exception("El campo Id es obligatorio");
-        }
+        // Validar que el Id pueda existir en la base de datos
+        if (id < 1) throw new Exception("No se ingresó un Id correcto");
         
         try {
             Autor autor = (Autor) em
@@ -85,8 +76,9 @@ public class AutorServicio {
             em.getTransaction().begin();
             em.merge(autor);
             em.getTransaction().commit();
+            
         } catch (Exception e) {
-            throw new Exception("No se encontraron registros con el id: " + id);
+            throw e;
         }
         
     }
@@ -95,9 +87,8 @@ public class AutorServicio {
         EntityManager em = p.crearEntityManager();
 
         // Validaciones
-        if (Integer.toString(id).isEmpty()) {
-            throw new Exception("El campo Id es obligatorio");
-        }
+        // Validar que el Id pueda existir en la base de datos
+        if (id < 1) throw new Exception("No se ingresó un Id correcto");
         
         try {
             Autor autor = (Autor) em
@@ -108,31 +99,8 @@ public class AutorServicio {
             return autor;
             
         } catch (Exception e) {
-            throw new Exception("No se encontraron registros con el id: " + id);
+            throw e;
         }
-        
-    }
-    
-    public boolean existeAutor(String nombre) throws Exception {
-        EntityManager em = p.crearEntityManager();
-
-        // Validaciones
-        if (nombre.isEmpty()) {
-            throw new Exception("El campo nombre es obligatorio");
-        }
-        
-        try {
-            Autor autor = (Autor) em
-                    .createQuery("SELECT a FROM Autor a WHERE a.nombre = :nombre")
-                    .setParameter("nombre", nombre)
-                    .getSingleResult();
-            
-            return true;
-            
-        } catch (Exception e) {
-            return false;
-        }
-        
     }
     
     public List<Autor> obtenerAutores() throws Exception {
@@ -148,14 +116,39 @@ public class AutorServicio {
         return autores;
     }
     
-    private Autor ingresarDatosAutor(Autor autor) {
+    public boolean existeAutor(String nombre) throws Exception {
+        EntityManager em = p.crearEntityManager();
+
+        // Validaciones
+        // Validar si se ingresó una string
+        if (nombre.isEmpty()) throw new Exception("El campo nombre es obligatorio");
+        
+        try {
+            Autor autor = (Autor) em
+                    .createQuery("SELECT a FROM Autor a WHERE a.nombre = :nombre")
+                    .setParameter("nombre", nombre)
+                    .getSingleResult();
+            
+            return true;
+            
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    private Autor ingresarDatosAutor(Autor autor) throws Exception {
+
         System.out.println("Ingresa el nombre del autor");
         autor.setNombre(scan.nextLine());
-        
-        if (!autor.isAlta()) {
+
+        // Validaciones
+        if (autor.getNombre().isEmpty()) throw new Exception("El campo Nombre es obligatorio");
+        if (existeAutor(autor.getNombre())) throw new Exception("Ya existe el autor: " + autor.getNombre());
+
+        if (autor.getId() == 0) {
             autor.setAlta(true);
         }
-        
+
         return autor;
     }
     

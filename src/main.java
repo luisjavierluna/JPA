@@ -1,5 +1,6 @@
 import servicios.AutorServicio;
 import servicios.EditorialServicio;
+import servicios.LibroServicio;
 
 public class main {
 
@@ -7,13 +8,14 @@ public class main {
         
         AutorServicio as = new AutorServicio();
         EditorialServicio es = new EditorialServicio();
+        LibroServicio ls = new LibroServicio();
         
         
         // AUTOR
             // as.darAltaAutor();
             // System.out.println(as.buscarAutorPorId(4));
             // System.out.println(as.obtenerAutores());
-            // as.modificarAutor(11);
+            // as.modificarAutor(12);
             // as.darBajaAutor(4);
         
         // EDITORIAL
@@ -23,7 +25,13 @@ public class main {
             // es.modificarEditorial(1);
             // es.darBajaEditorial(0);
             
-        
+        // LIBRO
+            // ls.darAltaLibro();
+            // System.out.println(ls.buscarLibroPorId(4));
+            // System.out.println(ls.obtenerLibros());
+            // ls.modificarLibro(3);
+            // ls.darBajaLibro(2);
+            
     }
     
 }
